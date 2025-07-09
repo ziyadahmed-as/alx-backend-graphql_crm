@@ -1,0 +1,1 @@
+0 8 * * * /mnt/c/Users/Django/Pictures/Camera\ Roll/ALX/alx_backend_graphql_crm/crm/cron_jobs/send_order_reminders.py
