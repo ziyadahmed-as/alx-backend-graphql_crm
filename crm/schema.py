@@ -9,6 +9,43 @@ from .models import Customer, Product, Order
 from django.utils import timezone
 import re
 
+import graphene
+from graphene_django import DjangoObjectType
+from .models import Product  # Assuming you have a Product model
+
+class ProductType(DjangoObjectType):
+    class Meta:
+        model = Product
+
+class UpdateLowStockProducts(graphene.Mutation):
+    class Arguments:
+        pass  # No arguments needed for this mutation
+
+    products = graphene.List(ProductType)
+    message = graphene.String()
+
+    def mutate(self, info):
+        # Get products with stock < 10
+        low_stock_products = Product.objects.filter(stock__lt=10)
+        
+        # Update stock for each product
+        updated_products = []
+        for product in low_stock_products:
+            product.stock += 10  # Increment stock by 10
+            product.save()
+            updated_products.append(product)
+        
+        return UpdateLowStockProducts(
+            products=updated_products,
+            message=f"Successfully updated {len(updated_products)} products"
+        )
+
+class Mutation(graphene.ObjectType):
+    update_low_stock_products = UpdateLowStockProducts.Field()
+
+# Make sure to include this in your main schema
+schema = graphene.Schema(mutation=Mutation)
+
 # This file defines the GraphQL schema for the CRM application.
 class CustomerInput(graphene.InputObjectType):
     name = graphene.String(required=True)
