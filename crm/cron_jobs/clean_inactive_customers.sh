@@ -1,10 +1,16 @@
 #!/bin/bash
 
+# Get current script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Change to Django project root
+cd "$SCRIPT_DIR/../../" || {
+  echo "Failed to change directory to project root"
+  exit 1
+}
+
 # Define timestamp
 timestamp=$(date "+%Y-%m-%d %H:%M:%S")
-
-# Activate virtual environment if necessary
-# source /path/to/venv/bin/activate
 
 # Run Django shell command to delete inactive customers and log results
 deleted_count=$(python3 manage.py shell -c "
