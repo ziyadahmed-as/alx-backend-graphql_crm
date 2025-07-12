@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'crm',
     'graphene_django',
     'django_filters',
+    'django_celery_beat',
 ]
 GRAPHENE = {
     "SCHEMA": "alx_backend_graphql_crm.schema.schema"
