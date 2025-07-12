@@ -1,13 +1,16 @@
 #!/bin/bash
 
-# Get current script directory
+# Determine cwd (current working directory) of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "Script cwd is: $SCRIPT_DIR"
 
 # Change to Django project root
-cd "$SCRIPT_DIR/../../" || {
-  echo "Failed to change directory to project root"
+if cd "$SCRIPT_DIR/../../"; then
+  echo "Changed directory to project root."
+else
+  echo "Failed to change cwd to project root."
   exit 1
-}
+fi
 
 # Define timestamp
 timestamp=$(date "+%Y-%m-%d %H:%M:%S")
