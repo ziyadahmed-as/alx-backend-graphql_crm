@@ -8,38 +8,42 @@ from graphql import GraphQLError
 from .models import Customer, Product, Order
 from django.utils import timezone
 import re
-
 import graphene
 from graphene_django import DjangoObjectType
-from .models import Product  # Assuming you have a Product model
+from .models import Product
 
 class ProductType(DjangoObjectType):
     class Meta:
         model = Product
+        fields = ("id", "name", "stock")
 
 class UpdateLowStockProducts(graphene.Mutation):
     class Arguments:
-        pass  # No arguments needed for this mutation
+        increment = graphene.Int(default_value=10)
 
-    products = graphene.List(ProductType)
+    success = graphene.Boolean()
     message = graphene.String()
+    updated_products = graphene.List(ProductType)
 
-    def mutate(self, info):
+    def mutate(self, info, increment):
         # Get products with stock < 10
         low_stock_products = Product.objects.filter(stock__lt=10)
-        
-        # Update stock for each product
         updated_products = []
+        
+        # Update each product's stock
         for product in low_stock_products:
-            product.stock += 10  # Increment stock by 10
+            product.stock += increment
             product.save()
             updated_products.append(product)
         
         return UpdateLowStockProducts(
-            products=updated_products,
-            message=f"Successfully updated {len(updated_products)} products"
+            success=True,
+            message=f"Updated {len(updated_products)} products",
+            updated_products=updated_products
         )
 
+
+# Add to your existing Mutation class if you have one
 class Mutation(graphene.ObjectType):
     update_low_stock_products = UpdateLowStockProducts.Field()
 
